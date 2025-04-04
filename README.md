@@ -1,36 +1,126 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BreadCrumbs Customer Demo
 
-## Getting Started
+## Server-Side Integration Guide
 
-First, run the development server:
+This documentation explains how to integrate the [BreadCrumbs](https://bread-crumbs.tech/docs) tracker on the server side for handling conversions.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Authentication
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The BreadCrumbs API requires authentication using:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `X-Client-Id`: Your BreadCrumbs client ID
+- `X-Client-Secret`: Your BreadCrumbs client secret
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> ⚠️ **Warning:** These credentials must be kept secure on your server and never exposed to the client.
 
-## Learn More
+You can find your API keys at:
 
-To learn more about Next.js, take a look at the following resources:
+[BreadCrumbs](https://bread-crumbs.tech) > Builders > Campaigns > [Your Campaign] > Integration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### API Integration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The server-side integration is implemented in [app/api/convert/route.ts](./app/api/convert/route.ts). 
 
-## Deploy on Vercel
+This endpoint handles converting events by making authenticated requests to the BreadCrumbs Tracking API.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For complete API documentation, visit [BreadCrumbs Tracking API Docs](https://bread-crumbs.tech/api/docs).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Implementation Example
+
+Follow these steps to implement server-side conversion tracking:
+
+1. **Environment Setup**
+
+   Configure the following environment variables in your `.env` file:
+
+   ```
+   BREADCRUMBS_CLIENT_ID=your_client_id
+   BREADCRUMBS_CLIENT_SECRET=your_client_secret
+   ```
+
+2. **Access API Keys**
+
+   Retrieve your authentication credentials from environment variables:
+
+   ```typescript
+   const BREADCRUMBS_CLIENT_ID = process.env.BREADCRUMBS_CLIENT_ID || '';
+   const BREADCRUMBS_CLIENT_SECRET = process.env.BREADCRUMBS_CLIENT_SECRET || '';
+   ```
+
+3. **Configure API URL**
+
+   Set up the BreadCrumbs Tracker API endpoint:
+
+   ```typescript
+   const BREADCRUMBS_TRACKER_API_URL = 'https:/breadcrumbs.tech/api/tracker/v1';
+   ```
+
+4. **Build the Conversion URL**
+
+   Construct the endpoint URL using the `crumbId` of the event you want to convert:
+
+   ```typescript
+   const url = `${BREADCRUMBS_TRACKER_URL}/crumbs/${crumbId}/pick`;
+   ```
+
+5. **Make the Conversion Request**
+
+   Perform the POST request to the endpoint with the required authentication headers:
+
+   ```typescript
+   const response = await fetch(url, {
+       method: 'POST',
+       headers: {
+           'Content-Type': 'application/json',
+           'X-Client-Id': BREADCRUMBS_CLIENT_ID,
+           'X-Client-Secret': BREADCRUMBS_CLIENT_SECRET,
+       },
+   });
+
+   const data = await response.json();
+   ```
+
+This request triggers the conversion of the event identified by `crumbId`. Upon success, it records the event as converted on the blockchain and initiates any associated referral payments.
+
+## Client-Side Integration Guide
+
+The BreadCrumbs tracking service is designed to be accessed only from the server side for security reasons.
+
+However, you will need to retrieve the `crumbId` from the URL and send it to your server to perform the conversion process.
+
+You can see a complete client-side implementation example in this demo at [app/page.tsx](./app/page.tsx).
+
+### Implementation Example
+
+Follow these steps to implement client-side tracking with Next.js:
+
+1. **Retrieve `crumbId` from URL Parameters**
+
+   Extract the crumb identifier from the URL search parameters:
+
+   ```typescript
+   import { useSearchParams } from "next/navigation";
+   
+   export default function Component() {
+     const searchParams = useSearchParams();
+     const crumbId = searchParams.get('crumbId');
+     
+     ...
+   }
+   ```
+
+2. **Send to Your Server**
+
+   Forward the crumb identifier to your server endpoint:
+
+   ```typescript
+   fetch('/api/convert', {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify({ crumbId }),
+    });
+   ```
+
+This approach maintains security by keeping your authentication credentials on the server while still tracking conversion events properly.
