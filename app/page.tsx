@@ -20,6 +20,18 @@ export default function Home() {
             <Tracker />
           </Suspense>
         </div>
+        <div className="max-w-screen-md">
+          <h2 className="text-lg font-bold">Documentation</h2>
+          <p>
+            Implementation of this demo in <a href="https://github.com/junqueror/breadcrumbs-customer-demo" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </p>
+          <p>
+            Check the <a href="https://bread-crumbs.tech/docs/developers" target="_blank" rel="noopener noreferrer">BreadCrumbs documentation for developers</a> for more information about the integration.
+          </p>
+          <p>
+            Check the <a href="https://bread-crumbs.tech/api/docs" target="_blank" rel="noopener noreferrer">BreadCrumbs API documentation</a> for more information about the tracker API.
+          </p>
+        </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center" />
     </div>

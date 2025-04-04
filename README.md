@@ -1,5 +1,9 @@
 # BreadCrumbs Customer Demo
 
+Customer side integration for [BreadCrumbs platform](https://bread-crumbs.tech/).
+
+Check here the live demo working: [Demo](breadcrumbs-customer-demo.vercel.app)
+
 ## Server-Side Integration Guide
 
 This documentation explains how to integrate the [BreadCrumbs](https://bread-crumbs.tech/docs) tracker on the server side for handling conversions.
