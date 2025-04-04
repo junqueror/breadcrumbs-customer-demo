@@ -4,11 +4,19 @@ Customer side integration for [BreadCrumbs platform](https://bread-crumbs.tech/)
 
 Check here the live demo working: [Demo](breadcrumbs-customer-demo.vercel.app)
 
-## Server-Side Integration Guide
+## Integration Guide
+
+BreadCrumbs tracking integration on your customer side consists in implementing this simple flow:
+
+1. Users are redirected to your website with an event tracking identifier (`crumbId`) as a search parameter in the URL
+2. On your client side: Retrieve the `crumbId` from the URL
+3. On your server side: Send back the `crumbId` to the specified tracker endpoint to perform the conversion
+
+### Server-Side 
 
 This documentation explains how to integrate the [BreadCrumbs](https://bread-crumbs.tech/docs) tracker on the server side for handling conversions.
 
-### Authentication
+#### Authentication
 
 The BreadCrumbs API requires authentication using:
 
@@ -21,7 +29,7 @@ You can find your API keys at:
 
 [BreadCrumbs](https://bread-crumbs.tech) > Builders > Campaigns > [Your Campaign] > Integration
 
-### API Integration
+#### API Integration
 
 The server-side integration is implemented in [app/api/convert/route.ts](./app/api/convert/route.ts). 
 
@@ -29,7 +37,7 @@ This endpoint handles converting events by making authenticated requests to the 
 
 For complete API documentation, visit [BreadCrumbs Tracking API Docs](https://bread-crumbs.tech/api/docs).
 
-### Implementation Example
+#### Implementation Example
 
 Follow these steps to implement server-side conversion tracking:
 
@@ -86,7 +94,7 @@ Follow these steps to implement server-side conversion tracking:
 
 This request triggers the conversion of the event identified by `crumbId`. Upon success, it records the event as converted on the blockchain and initiates any associated referral payments.
 
-## Client-Side Integration Guide
+### Client-Side
 
 The BreadCrumbs tracking service is designed to be accessed only from the server side for security reasons.
 
@@ -94,7 +102,7 @@ However, you will need to retrieve the `crumbId` from the URL and send it to you
 
 You can see a complete client-side implementation example in this demo at [app/page.tsx](./app/page.tsx).
 
-### Implementation Example
+#### Implementation Example
 
 Follow these steps to implement client-side tracking with Next.js:
 
