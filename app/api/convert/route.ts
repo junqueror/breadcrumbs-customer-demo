@@ -9,7 +9,7 @@ const BREADCRUMBS_TRACKER_API_URL = process.env.BREADCRUMBS_TRACKER_API_URL || '
 export async function POST(req: NextRequest) {
     const { crumbId } = await req.json();
 
-    const url = `${BREADCRUMBS_TRACKER_API_URL}/crumbs/${crumbId}/pick`;
+    const url = `${BREADCRUMBS_TRACKER_API_URL}/pick`;
 
     try {
         const response = await fetch(url, {
@@ -19,6 +19,10 @@ export async function POST(req: NextRequest) {
                 'X-Client-Id': BREADCRUMBS_CLIENT_ID,
                 'X-Client-Secret': BREADCRUMBS_CLIENT_SECRET,
             },
+            body: JSON.stringify({
+                crumbId,
+                conversionType: 'Action'
+            }),
         });
 
         const data = await response.json();

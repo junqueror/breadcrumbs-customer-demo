@@ -20,7 +20,7 @@ const Tracker = () => {
     }).then(async (response) => {
 
         if (response.ok === false) {
-            const errorMessage = await response.json().then((data) => data.error);
+            const errorMessage = await response.json().then((data) => data.message);
             throw new Error(errorMessage);
         }
 
