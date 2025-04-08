@@ -4,9 +4,17 @@ Customer side integration for [BreadCrumbs platform](https://bread-crumbs.tech/)
 
 ## Usage
 
-BreadCrumbs tracking integration on your customer side consists in implementing the following flow
+### Understanding the tracking flow
 
-Users are redirected to your website with an event tracking identifier (`crumbId`) as a search parameter in the URL. So you just need to retrieve it and send it back to perform the conversion.
+BreadCrumbs uses a postback tracking system based on blockchain technology to ensure trustlessness and transparency. Here's how it works:
+
+BreadCrumbs tracking integration on your customer side consists in implementing the following flow:
+
+1. **Referral Click**: A user clicks on a campaign referral/affiliate link
+2. **Crumb Creation**: BreadCrumbs creates a tracking event ("crumb") with a unique ID
+3. **Redirect**: The user is redirected to your website with the `crumbId` in the URL
+4. **Conversion**: When the user completes the desired action on your site, you send the `crumbId` back by sending a "pick" request from your server to confirm the conversion
+5. **Reward**: BreadCrumbs processes the conversion and distributes rewards on-chain
 
 ### Retrieve the `crumbId` from the URL (Client Side)
 
@@ -70,7 +78,7 @@ You can find your API keys at:
 
 Follow these steps to implement server-side conversion tracking:
 
-1. **Environment Setup**
+1. **Environment setup**
 
    Configure the following environment variables in your `.env` file:
 
@@ -79,7 +87,9 @@ Follow these steps to implement server-side conversion tracking:
    BREADCRUMBS_CLIENT_SECRET=your_client_secret
    ```
 
-2. **Access API Keys**
+   <br />
+
+2. **Access API keys**
 
    Retrieve your authentication credentials from environment variables:
 
@@ -88,6 +98,8 @@ Follow these steps to implement server-side conversion tracking:
    const BREADCRUMBS_CLIENT_SECRET = process.env.BREADCRUMBS_CLIENT_SECRET || '';
    ```
 
+   <br />
+
 3. **Configure BreadCrumbs Tracker API URL**
 
    Set up the BreadCrumbs Tracker API endpoint:
@@ -95,8 +107,9 @@ Follow these steps to implement server-side conversion tracking:
    ```typescript
    const BREADCRUMBS_TRACKER_API_URL = 'https:/breadcrumbs.tech/api/tracker/v1';
    ```
+   <br />
 
-4. **Build the Conversion URL**
+4. **Build the conversion URL**
 
    Construct the endpoint URL for conversions:
 
@@ -105,8 +118,10 @@ Follow these steps to implement server-side conversion tracking:
    ```
 
    For complete API documentation about conversion endpoint, visit [BreadCrumbs Tracking API Docs](https://bread-crumbs.tech/api/docs#/Tracker/pickCrumb).
+   
+   <br />
 
-5. **Make the Conversion Request**
+5. **Make the conversion request**
 
    Perform the POST request to the endpoint with the required configuration:
    - Authentication headers
@@ -116,6 +131,7 @@ Follow these steps to implement server-side conversion tracking:
    ```typescript
    const BREADCRUMBS_CLIENT_ID = process.env.BREADCRUMBS_CLIENT_ID || '';
    const BREADCRUMBS_CLIENT_SECRET = process.env.BREADCRUMBS_CLIENT_SECRET || '';
+   const BREADCRUMBS_TRACKER_API_URL = 'https:/breadcrumbs.tech/api/tracker/v1';
 
    const url = `${BREADCRUMBS_TRACKER_URL}/pick`;
 
@@ -127,17 +143,18 @@ Follow these steps to implement server-side conversion tracking:
          'X-Client-Secret': BREADCRUMBS_CLIENT_SECRET,
        },
       body: JSON.stringify({ 
-         crumbId: 'exampleId',
-         conversionType: 'ExampleType'
+         crumbId: 'CRUMB_ID',
+         conversionType: 'CONVERSION_TYPE'
       }),
    });
 
    const data = await response.json();
    ```
 
-  - You can get your authentication headers from the BreadCrumbs dashboard, in the [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Security/Integration
-  - `crumbId` must be retrieved from the URL parameters on the client side. Check the [Client Side](#client-side) section for more details
-  - You can get the `conversionType` from the BreadCrumbs dashboard, in the [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Integration
+   Where:
+   - **Authentication headers** can be retrieved from the BreadCrumbs dashboard, in the [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Security
+   - **`CRUMB_ID`** must be retrieved from the URL parameters on the client side. Check the [Client Side](#client-side) section for more details
+   - **`CONVERSION_TYPE`** can be retrieved from the BreadCrumbs dashboard, in the [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Integration
 
 This request triggers the conversion of the event identified by `crumbId`. Upon success, it records the event as converted on the blockchain and initiates any associated referral payments.
 
