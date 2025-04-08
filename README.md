@@ -2,19 +2,56 @@
 
 Customer side integration for [BreadCrumbs platform](https://bread-crumbs.tech/).
 
-Check here the live demo working: [Demo](breadcrumbs-customer-demo.vercel.app)
+## Usage
 
-## Integration Guide
+BreadCrumbs tracking integration on your customer side consists in implementing the following flow
 
-BreadCrumbs tracking integration on your customer side consists in implementing this simple flow:
+Users are redirected to your website with an event tracking identifier (`crumbId`) as a search parameter in the URL. So you just need to retrieve it and send it back to perform the conversion.
 
-1. Users are redirected to your website with an event tracking identifier (`crumbId`) as a search parameter in the URL
-2. On your client side: Retrieve the `crumbId` from the URL
-3. On your server side: Send back the `crumbId` to the specified tracker endpoint to perform the conversion
+### Retrieve the `crumbId` from the URL (Client Side)
 
-### Server Side 
+The BreadCrumbs tracking service is designed to be accessed only from the server side for security reasons.
 
-This documentation explains how to integrate the [BreadCrumbs Tracker API](https://bread-crumbs.tech/api/docs) on the server side for handling conversions.
+You will need to retrieve the `crumbId` from the URL and send it to your server to perform the conversion process.
+
+#### Implementation
+
+In this guide, we will use Next.js to retrieve the `crumbId` from the URL and send it to the server.
+
+1. **Retrieve `crumbId` from URL parameters**
+
+   Extract the crumb identifier from the URL search parameters:
+
+   ```typescript
+   import { useSearchParams } from "next/navigation";
+   
+   export default function Component() {
+     const searchParams = useSearchParams();
+     const crumbId = searchParams.get('crumbId');
+     
+     ...
+   }
+   ```
+
+2. **Send it to your server**
+
+   Forward the crumb identifier to your server endpoint:
+
+   ```typescript
+   fetch('/your-custom-endpoint', {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify({ crumbId }),
+    });
+   ```
+
+This approach maintains security by keeping your authentication credentials on the server and avoiding fraudulent conversions on client side, while still tracking conversion events properly.
+
+### Send back the `crumbId` to convert the event (Server Side)
+
+To convert the event, you will need to send back the `crumbId` to the [BreadCrumbs Tracker API](https://bread-crumbs.tech/api/docs) on the server side.
 
 #### Authentication
 
@@ -23,21 +60,13 @@ The BreadCrumbs API requires authentication using:
 - `X-Client-Id`: Your BreadCrumbs client ID
 - `X-Client-Secret`: Your BreadCrumbs client secret
 
-> ⚠️ **Warning:** These credentials must be kept secure on your server and never exposed to the client.
-
 You can find your API keys at:
 
-- [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Integration
+- [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Security
 
-#### API Integration
+> ⚠️ **Warning:** These credentials must be kept secure on your server and never exposed client side.
 
-The server-side integration is implemented in [app/api/convert/route.ts](./app/api/convert/route.ts). 
-
-This endpoint handles converting events by making authenticated requests to the BreadCrumbs Tracking API.
-
-For complete API documentation, visit [BreadCrumbs Tracking API Docs](https://bread-crumbs.tech/api/docs).
-
-#### Implementation Example
+#### Implementation
 
 Follow these steps to implement server-side conversion tracking:
 
@@ -59,7 +88,7 @@ Follow these steps to implement server-side conversion tracking:
    const BREADCRUMBS_CLIENT_SECRET = process.env.BREADCRUMBS_CLIENT_SECRET || '';
    ```
 
-3. **Configure API URL**
+3. **Configure BreadCrumbs Tracker API URL**
 
    Set up the BreadCrumbs Tracker API endpoint:
 
@@ -75,6 +104,8 @@ Follow these steps to implement server-side conversion tracking:
    const url = `${BREADCRUMBS_TRACKER_URL}/pick`;
    ```
 
+   For complete API documentation about conversion endpoint, visit [BreadCrumbs Tracking API Docs](https://bread-crumbs.tech/api/docs#/Tracker/pickCrumb).
+
 5. **Make the Conversion Request**
 
    Perform the POST request to the endpoint with the required configuration:
@@ -83,6 +114,11 @@ Follow these steps to implement server-side conversion tracking:
    - Conversion type in the body as `conversionType`
 
    ```typescript
+   const BREADCRUMBS_CLIENT_ID = process.env.BREADCRUMBS_CLIENT_ID || '';
+   const BREADCRUMBS_CLIENT_SECRET = process.env.BREADCRUMBS_CLIENT_SECRET || '';
+
+   const url = `${BREADCRUMBS_TRACKER_URL}/pick`;
+
    const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -99,55 +135,19 @@ Follow these steps to implement server-side conversion tracking:
    const data = await response.json();
    ```
 
-> **Note:** 
-  - You can get your authentication headers from the BreadCrumbs dashboard, in the [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Integration
+  - You can get your authentication headers from the BreadCrumbs dashboard, in the [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Security/Integration
   - `crumbId` must be retrieved from the URL parameters on the client side. Check the [Client Side](#client-side) section for more details
-  - You can get the `conversionType` from the BreadCrumbs dashboard, in the [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Objective tab
+  - You can get the `conversionType` from the BreadCrumbs dashboard, in the [BreadCrumbs App > Builders > Campaigns](https://bread-crumbs.tech/app/advertisers/campaigns) > [Your Campaign] > Integration
 
 This request triggers the conversion of the event identified by `crumbId`. Upon success, it records the event as converted on the blockchain and initiates any associated referral payments.
 
-### Client Side
+## Example
 
-The BreadCrumbs tracking service is designed to be accessed only from the server side for security reasons.
+Live demo: [BreadCrumbs Customer Demo](breadcrumbs-customer-demo.vercel.app)
 
-However, you will need to retrieve the `crumbId` from the URL and send it to your server to perform the conversion process.
+You can see a complete client side implementation example in this demo at [app/page.tsx](./app/page.tsx).
 
-You can see a complete client-side implementation example in this demo at [app/page.tsx](./app/page.tsx).
-
-#### Implementation Example
-
-Follow these steps to implement client-side tracking with Next.js:
-
-1. **Retrieve `crumbId` from URL Parameters**
-
-   Extract the crumb identifier from the URL search parameters:
-
-   ```typescript
-   import { useSearchParams } from "next/navigation";
-   
-   export default function Component() {
-     const searchParams = useSearchParams();
-     const crumbId = searchParams.get('crumbId');
-     
-     ...
-   }
-   ```
-
-2. **Send to Your Server**
-
-   Forward the crumb identifier to your server endpoint:
-
-   ```typescript
-   fetch('/your-custom-endpoint', {
-       method: 'POST',
-       headers: {
-         'Content-Type': 'application/json'
-       },
-       body: JSON.stringify({ crumbId }),
-    });
-   ```
-
-This approach maintains security by keeping your authentication credentials on the server while still tracking conversion events properly.
+The server side integration is implemented in [app/api/convert/route.ts](./app/api/convert/route.ts). 
 
 ## FAQ
 
