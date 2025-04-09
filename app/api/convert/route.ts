@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const BREADCRUMBS_CLIENT_ID = process.env.BREADCRUMBS_CLIENT_ID || '';
 const BREADCRUMBS_CLIENT_SECRET = process.env.BREADCRUMBS_CLIENT_SECRET || '';
+const BREADCRUMBS_CONVERSION_TYPE = process.env.BREADCRUMBS_CONVERSION_TYPE || 'CustomAction';
 
-const BREADCRUMBS_TRACKER_API_URL = 'https:/breadcrumbs.tech/api/tracker/v1';
+const BREADCRUMBS_TRACKER_API_URL = 'https://bread-crumbs.tech/api/tracker/v1';
 
 export async function POST(req: NextRequest) {
     const { crumbId } = await req.json();
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify({
                 crumbId,
-                conversionType: 'CustomAction'
+                conversionType: BREADCRUMBS_CONVERSION_TYPE
             }),
         });
 

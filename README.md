@@ -22,7 +22,7 @@ The BreadCrumbs tracking service is designed to be accessed only from the server
 
 You will need to retrieve the `crumbId` from the URL and send it to your server to perform the conversion process.
 
-#### Implementation
+#### Implementation
 
 In this guide, we will use Next.js to retrieve the `crumbId` from the URL and send it to the server.
 
